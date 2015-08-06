@@ -44,7 +44,7 @@ jenkinsBuild = (msg, buildWithEmptyParameters) ->
     job = querystring.escape msg.match[1]
     params = msg.match[3]
     command = if buildWithEmptyParameters then "buildWithParameters" else "build"
-    path = if params then "#{url}/(.*)/job/#{job}/buildWithParameters?#{params}" else "#{url}/(.*)/job/#{job}/#{command}"
+    path = if params then "#{url}/S^/job/#{job}/buildWithParameters?#{params}" else "#{url}/S^/job/#{job}/#{command}"
 
     req = msg.http(path)
 
@@ -57,7 +57,7 @@ jenkinsBuild = (msg, buildWithEmptyParameters) ->
         if err
           msg.reply "Jenkins says: #{err}"
         else if 200 <= res.statusCode < 400 # Or, not an error code.
-          msg.reply "(#{res.statusCode}) Build started for #{job} #{url}/(.*)/job/#{job}"
+          msg.reply "(#{res.statusCode}) Build started for #{job} #{url}/S^/job/#{job}"
         else if 400 == res.statusCode
           jenkinsBuild(msg, true)
         else if 404 == res.statusCode
@@ -69,7 +69,7 @@ jenkinsDescribe = (msg) ->
     url = process.env.HUBOT_JENKINS_URL
     job = msg.match[1]
 
-    path = "#{url}/(.*)/job/#{job}/api/json"
+    path = "#{url}/S^/job/#{job}/api/json"
 
     req = msg.http(path)
 
@@ -118,7 +118,7 @@ jenkinsDescribe = (msg) ->
             if not content.lastBuild
               return
 
-            path = "#{url}/(.*)/job/#{job}/#{content.lastBuild.number}/api/json"
+            path = "#{url}/S^/job/#{job}/#{content.lastBuild.number}/api/json"
             req = msg.http(path)
             if process.env.HUBOT_JENKINS_AUTH
               auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
@@ -148,7 +148,7 @@ jenkinsLast = (msg) ->
     url = process.env.HUBOT_JENKINS_URL
     job = msg.match[1]
 
-    path = "#{url}/(.*)/job#{job}/lastBuild/api/json"
+    path = "#{url}/S^/job#{job}/lastBuild/api/json"
 
     req = msg.http(path)
 
